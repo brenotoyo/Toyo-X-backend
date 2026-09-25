@@ -39,8 +39,10 @@
     "ignore.virus.scanning.warn.message": "true",
     "last_opened_file_path": "C:/Users/breno/Desktop/Breno/EBAC/Projeto Final/Back",
     "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.jshint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.jshint": "",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm"
   }
