@@ -15,6 +15,6 @@ urlpatterns = [
     path('<int:pk>/follow/',  FollowToggleView.as_view(),   name='follow-toggle'),
     path('search/',           UserSearchView.as_view(),     name='user-search'),
     path('change-password/',  ChangePasswordView.as_view(), name='change-password'),
-    path('me/followers/',     FollowersListView.as_view(),  name='my-followers'),  # ← novo
-    path('me/following/',     FollowingListView.as_view(),  name='my-following'),  # ← novo
+    path('me/followers/',     FollowersListView.as_view(),  name='my-followers'),
+    path('me/following/',     FollowingListView.as_view(),  name='my-following')
 ]

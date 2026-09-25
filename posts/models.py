@@ -8,7 +8,7 @@ class Post(models.Model):
         related_name='posts'
     )
     content   = models.TextField(max_length=280)
-    image     = models.ImageField(upload_to='posts/')  # obrigatória
+    image     = models.ImageField(upload_to='posts/')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

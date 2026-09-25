@@ -7,5 +7,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path('api/auth/',          include('users.urls')),
     path('api/posts/',         include('posts.urls')),
-    path('api/notifications/', include('notifications.urls')),  # ← novo
+    path('api/notifications/', include('notifications.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
