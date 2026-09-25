@@ -140,9 +140,22 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
 ]
 
+# CORS
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+]
+
+VERCEL_URL = os.environ.get("VERCEL_URL")
+if VERCEL_URL:
+    CORS_ALLOWED_ORIGINS.append(VERCEL_URL)
+
 # Adiciona a URL do Vercel se estiver configurada
 VERCEL_URL = os.environ.get("VERCEL_URL")
 if VERCEL_URL:
     CORS_ALLOWED_ORIGINS.append(VERCEL_URL)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://web-production-86c3a.up.railway.app',
+]
