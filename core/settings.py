@@ -4,7 +4,7 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ─── Segurança ───────────────────────────────────────────────────────────────
+# ─── Segurança ────────────────────────────────────────────────────────────────
 SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-fallback-dev-only")
 DEBUG      = os.environ.get("DEBUG", "False") == "True"
 
@@ -17,13 +17,14 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    # Cloudinary ANTES do staticfiles ← obrigatório
+    'cloudinary',
+    'cloudinary_storage',
     "django.contrib.staticfiles",
     # Terceiros
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
-    'cloudinary',
-    'cloudinary_storage',
     # Meus apps
     'users',
     'posts',
@@ -33,7 +34,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",   # ← serve arquivos estáticos
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -63,7 +64,6 @@ TEMPLATES = [
 WSGI_APPLICATION = "core.wsgi.application"
 
 # ─── Banco de dados ───────────────────────────────────────────────────────────
-# Em produção o Railway injeta DATABASE_URL automaticamente
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
 if DATABASE_URL:
@@ -72,7 +72,6 @@ if DATABASE_URL:
         "default": dj_database_url.parse(DATABASE_URL, conn_max_age=600)
     }
 else:
-    # Desenvolvimento local continua usando SQLite
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -96,12 +95,13 @@ TIME_ZONE     = "America/Sao_Paulo"
 USE_I18N      = True
 USE_TZ        = True
 
-# ─── Arquivos estáticos ───────────────────────────────────────────────────────
+# ─── Arquivos estáticos e de mídia ───────────────────────────────────────────
 STATIC_URL  = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+MEDIA_URL   = "/media/"
+MEDIA_ROOT  = BASE_DIR / "media"
 
-# ─── Arquivos de mídia — Cloudinary em produção ───────────────────────────────
+# ─── Cloudinary ───────────────────────────────────────────────────────────────
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', ''),
     'API_KEY':    os.environ.get('CLOUDINARY_API_KEY', ''),
@@ -109,13 +109,25 @@ CLOUDINARY_STORAGE = {
 }
 
 if os.environ.get('CLOUDINARY_CLOUD_NAME'):
-    # Produção: imagens vão para o Cloudinary
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    MEDIA_URL = '/media/'
+    # Produção: usa Cloudinary para mídia e Whitenoise para estáticos
+    STORAGES = {
+        "default": {
+            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
 else:
-    # Desenvolvimento local: imagens ficam na pasta /media/
-    MEDIA_URL  = '/media/'
-    MEDIA_ROOT = BASE_DIR / 'media'
+    # Desenvolvimento local
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
 
 # ─── REST Framework ───────────────────────────────────────────────────────────
 REST_FRAMEWORK = {
@@ -140,22 +152,13 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
 ]
 
-# CORS
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',
-]
-
 VERCEL_URL = os.environ.get("VERCEL_URL")
 if VERCEL_URL:
     CORS_ALLOWED_ORIGINS.append(VERCEL_URL)
 
-# Adiciona a URL do Vercel se estiver configurada
-VERCEL_URL = os.environ.get("VERCEL_URL")
-if VERCEL_URL:
-    CORS_ALLOWED_ORIGINS.append(VERCEL_URL)
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
+# ─── CSRF ─────────────────────────────────────────────────────────────────────
 CSRF_TRUSTED_ORIGINS = [
     'https://web-production-86c3a.up.railway.app',
 ]
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
