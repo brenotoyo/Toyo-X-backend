@@ -28,13 +28,16 @@ class UserSerializer(serializers.ModelSerializer):
         return False
 
     def to_representation(self, instance):
-        data    = super().to_representation(instance)
+        data = super().to_representation(instance)
         request = self.context.get('request')
         if request:
             if instance.avatar:
-                data['avatar'] = request.build_absolute_uri(instance.avatar.url)
+                url = instance.avatar.url
+                # Se já for URL absoluta (Cloudinary), não usa build_absolute_uri
+                data['avatar'] = url if url.startswith('http') else request.build_absolute_uri(url)
             if instance.banner:
-                data['banner'] = request.build_absolute_uri(instance.banner.url)
+                url = instance.banner.url
+                data['banner'] = url if url.startswith('http') else request.build_absolute_uri(url)
         return data
 
 
